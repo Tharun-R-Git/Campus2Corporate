@@ -3,9 +3,12 @@
 import { cookies } from "next/headers"
 import { redirect } from "next/navigation"
 import { SignJWT, jwtVerify } from "jose"
+import Student from "@/lib/models/student";
+import Alumni from "@/lib/models/alumni";
 import bcrypt from "bcryptjs"
 import clientPromise from "./db"
 import type { StudentFormData, AlumniFormData, LoginFormData } from "./validation"
+import dbconnect from "./db"
 
 // Secret key for JWT
 const secretKey = new TextEncoder().encode(process.env.JWT_SECRET || "fallback_secret_key_for_development_only")
@@ -17,29 +20,42 @@ const expiration = "24h"
 export async function registerStudent(data: StudentFormData) {
   try {
     const client = await clientPromise
+    dbconnect()
     console.log("MongoDB connected successfully")
-    const db = client.db("auth-system")
-    const users = db.collection("users")
+    // const db = client.db("auth-system")
+    // const users = db.collection("users")
 
     // Check if user already exists
-    const existingUser = await users.findOne({ email: data.email })
-    if (existingUser) {
+    const student = await Student.findOne({ email: data.email });
+    if (student) {
       return { success: false, message: "User already exists" }
     }
 
     // Hash password
     const hashedPassword = await bcrypt.hash(data.password, 10)
-
+    console.log("\n\n\n\n\n\n\This is the hashed Password",hashedPassword)
     // Create user object (omitting confirmPassword)
     const { confirmPassword, ...userData } = data
+    console.log("Came Here Successfully : ")
+    console.log(userData)
 
+    // Map userData to match the Student schema
+const studentData = {
+  name: "Naveen",
+  email: userData.email,
+  regNumber: userData.rollNumber,
+  category: "super-dream", // Default value if not provided
+  branch: userData.branch,
+  school: userData.school,
+  cgpa: userData.cgpa,
+  password: hashedPassword,
+  createdAt: new Date(),
+};
+
+console.log("Mapped Student Data:", studentData);
     // Insert user into database
-    await users.insertOne({
-      ...userData,
-      password: hashedPassword,
-      createdAt: new Date(),
-    })
-
+    await Student.insertOne(studentData)
+    console.log("ok")
     return { success: true, message: "Registration successful" }
   } catch (error) {
     console.error("Registration error details:", error)
@@ -54,11 +70,10 @@ export async function registerStudent(data: StudentFormData) {
 export async function registerAlumni(data: AlumniFormData) {
   try {
     const client = await clientPromise
-    const db = client.db("auth-system")
-    const users = db.collection("users")
+    dbconnect();
 
     // Check if user already exists
-    const existingUser = await users.findOne({ email: data.email })
+    const existingUser = await Alumni.findOne({ email: data.email })
     if (existingUser) {
       return { success: false, message: "User already exists" }
     }
@@ -70,7 +85,7 @@ export async function registerAlumni(data: AlumniFormData) {
     const { confirmPassword, ...userData } = data
 
     // Insert user into database
-    await users.insertOne({
+    await Alumni.insertOne({
       ...userData,
       password: hashedPassword,
       createdAt: new Date(),
@@ -87,14 +102,17 @@ export async function registerAlumni(data: AlumniFormData) {
 export async function loginUser(data: LoginFormData) {
   try {
     const client = await clientPromise
-    const db = client.db("auth-system")
-    const users = db.collection("users")
-
+    dbconnect()
     // Find user by email
-    const user = await users.findOne({ email: data.email })
+    const user = await Student.findOne({ email: data.email })
     if (!user) {
       return { success: false, message: "Invalid email or password" }
     }
+    console.log("User Present ! ! ! !\n\n\n")
+    console.log(data)
+
+    console.log("User Data : ",data.password)
+    console.log("DataBase Password : ",user.password)
 
     // Verify password
     const isPasswordValid = await bcrypt.compare(data.password, user.password)

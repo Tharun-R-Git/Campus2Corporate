@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server"
-import { connectToDatabase } from "@/lib/db"
+import dbconnect from "@/db/dbconnect"
 import Alumni from "@/lib/models/alumni"
 
 export async function GET(request: Request) {
   try {
-    await connectToDatabase()
+    await dbconnect()
 
     const { searchParams } = new URL(request.url)
     const company = searchParams.get("company")

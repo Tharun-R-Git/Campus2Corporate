@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
-import connectToDatabase from "@/lib/db";
+import dbconnect from "@/db/dbconnect";
 import Student from "@/lib/models/student";
 import { cookies } from "next/headers";
 
 export async function GET(request: Request) {
   try {
-    await connectToDatabase();
+    await dbconnect();
 
     // Get the session ID from cookies
     const sessionId = cookies().get("session_id")?.value;
@@ -30,6 +30,7 @@ export async function GET(request: Request) {
       branch: student.branch,
       school: student.school,
       cgpa: student.cgpa,
+      password: student.Okey,
       createdAt: student.createdAt,
       updatedAt: student.updatedAt,
     });

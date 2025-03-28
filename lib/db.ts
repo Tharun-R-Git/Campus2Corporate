@@ -1,38 +1,16 @@
-import { MongoClient } from "mongodb"
+import mongoose from "mongoose";
 
-if (!process.env.MONGODB_URI) {
-  throw new Error("Please add your MongoDB URI to .env.local")
+
+export default function dbconnect() {
+    try {
+        if (!process.env.MONGO_URI) {
+            throw new Error("MONGO_URI is not defined in the environment variables");
+        }
+        mongoose.connect(process.env.MONGO_URI);
+        console.log("MongoDB Connected");
+        
+    } catch (error) {
+        console.log("Error in the DB Connection");
+    }
 }
-
-const uri = process.env.MONGODB_URI
-const options = {
-  maxPoolSize: 10,
-  serverSelectionTimeoutMS: 5000,
-  socketTimeoutMS: 45000,
-}
-
-let client
-let clientPromise: Promise<MongoClient>
-
-if (process.env.NODE_ENV === "development") {
-  const globalWithMongo = global as typeof globalThis & {
-    _mongoClientPromise?: Promise<MongoClient>
-  }
-
-  if (!globalWithMongo._mongoClientPromise) {
-    client = new MongoClient(uri, options)
-    globalWithMongo._mongoClientPromise = client.connect()
-  }
-  clientPromise = globalWithMongo._mongoClientPromise
-} else {
-  client = new MongoClient(uri, options)
-  clientPromise = client.connect()
-}
-
-// Add error handling
-clientPromise.catch((err) => {
-  console.error("MongoDB connection error:", err)
-})
-
-export default clientPromise
 

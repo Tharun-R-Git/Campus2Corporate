@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server"
-import { connectToDatabase } from "@/lib/db"
+import dbconnect from "@/db/dbconnect"
 import Student from "@/lib/models/student"
 import { cookies } from "next/headers"
 import bcrypt from "bcryptjs"
 
 export async function POST(request: Request) {
   try {
-    await connectToDatabase()
+    await dbconnect()
 
     const { email, password } = await request.json()
 

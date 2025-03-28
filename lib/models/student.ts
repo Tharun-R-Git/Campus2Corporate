@@ -9,10 +9,11 @@ export interface IStudent extends Document {
   branch: string
   cgpa : string
   school : string
-  // totalScore: number
-  // progressPercentage: number
-  // completedTasks: number
-  // totalTasks: number
+  password: string
+  totalScore: number
+  progressPercentage: number
+  completedTasks: number
+  totalTasks: number
   createdAt: Date
   updatedAt: Date
 }
@@ -27,10 +28,11 @@ const StudentSchema: Schema = new Schema(
     branch: {type: String, required: true},
     school: {type: String, required: true},
     cgpa: {type: String, required: true},
-    //totalScore: { type: Number, default: 0 },
-    //progressPercentage: { type: Number, default: 0 },
-    //completedTasks: { type: Number, default: 0 },
-    //totalTasks: { type: Number, default: 0 },
+    password:{type: String, required: true},
+    totalScore: { type: Number, default: 0 },
+    progressPercentage: { type: Number, default: 0 },
+    completedTasks: { type: Number, default: 0 },
+    totalTasks: { type: Number, default: 0 },
   },
   { timestamps: true },
 )
