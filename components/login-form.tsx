@@ -33,7 +33,7 @@ export default function LoginForm() {
     setError(null)
 
     try {
-      const result = await loginUser(data)
+      const result = await loginUser(data) as { success: boolean; message: string; userType?: string }
 
       if (result.success) {
         setSuccess("Login successful! Redirecting...")

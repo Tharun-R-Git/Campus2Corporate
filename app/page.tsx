@@ -12,8 +12,10 @@ import { TestimonialCard } from "@/components/testimonial-card"
 import { ProgressDemo } from "@/components/progress-demo"
 import { NavBar } from "@/components/nav-bar"
 import { Footer } from "@/components/footer"
+import dbconnect from "@/db/dbconnect"
 
 export default function Home() {
+  dbconnect();
   return (
     <div className="flex min-h-screen flex-col">
       <NavBar />
